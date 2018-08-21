@@ -1,0 +1,39 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <CheckButton name="tdBagToggleButtonTemplate" virtual="true">
+        <Size x="24" y="24" />
+        <NormalTexture atlas="worldquest-tracker-ring">
+            <Size x="32" y="32" />
+            <Anchors>
+                <Anchor point="CENTER" x="0" y="0" />
+            </Anchors>
+        </NormalTexture>
+        <HighlightTexture atlas="worldquest-tracker-ring-selected" alphaMode="ADD" alpha="0.4">
+            <Size x="32" y="32" />
+            <Anchors>
+                <Anchor point="CENTER" x="0" y="0" />
+            </Anchors>
+        </HighlightTexture>
+        <Scripts>
+            <OnLoad>
+                self.icon:SetMask([[Interface\CharacterFrame\TempPortraitAlphaMask]])
+            </OnLoad>
+        </Scripts>
+    </CheckButton>
+
+    <CheckButton name="tdBagBagToggleTemplate" inherits="tdBagToggleButtonTemplate" virtual="true">
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="icon" file="Interface\BUTTONS\Button-Backpack-Up" />
+            </Layer>
+        </Layers>
+    </CheckButton>
+
+    <CheckButton name="tdBagSortButtonTemplate" inherits="tdBagToggleButtonTemplate" virtual="true">
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="icon" file="Interface\ICONS\INV_Pet_Broom" />
+            </Layer>
+        </Layers>
+    </CheckButton>
+</Ui>

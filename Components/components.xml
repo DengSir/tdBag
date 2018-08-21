@@ -1,0 +1,17 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Include file="template.xml" />
+    <Script file="bag.lua" />
+    <Script file="itemFrame.lua" />
+    <Script file="searchFrame.lua" />
+    <Script file="titleFrame.lua" />
+    <Script file="moneyFrame.lua" />
+    <Script file="token.lua" />
+    <Script file="tokenFrame.lua" />
+    <Script file="ownerSelector.lua" />
+    <Script file="item.lua" />
+    <Script file="frame.lua" />
+    <Script file="bankTab.lua" />
+    <Script file="bankBagFrame.lua" />
+    <Script file="bank.lua" />
+</Ui>
