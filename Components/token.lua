@@ -3,8 +3,6 @@ token.lua
 @Author  : DengSir (tdaddon@163.com)
 @Link    : https://dengsir.github.io
 ]]
-
-
 local ADDON, Addon = ...
 local Token = Addon:NewClass('Token', 'Button')
 
@@ -33,14 +31,24 @@ function Token:New(parent)
 end
 
 function Token:OnEnter()
-    GameTooltip:SetOwner(self, 'ANCHOR_BOTTOM', 0, -7)
+    GameTooltip:SetOwner(self:GetParent(), 'ANCHOR_TOP')
     GameTooltip:SetBackpackToken(self.index)
+    -- GameTooltip:SetText(CURRENCY)
+    -- for i = 1, GetNumWatchedTokens() do
+    --     local name, count, icon, id = GetBackpackCurrencyInfo(i)
+    --     local rarity = select(8, GetCurrencyInfo(id))
+    --     local l = ITEM_QUALITY_COLORS[rarity] or HIGHLIGHT_FONT_COLOR
+    --     local r = IsCurrencyFull and IsCurrencyFull(id) and RED_FONT_COLOR or HIGHLIGHT_FONT_COLOR
+    --     GameTooltip:AddDoubleLine(format('|T%s:16|t %s', icon, name), count, l.r, l.g, l.b, 1, r.r, r.g, r.b)
+    -- end
     GameTooltip:Show()
 end
 
 function Token:OnClick()
     if IsModifiedClick('CHATLINK') then
         HandleModifiedItemClick(GetCurrencyLink(self.id, self.count))
+    else
+        ToggleCharacter('TokenFrame')
     end
 end
 
