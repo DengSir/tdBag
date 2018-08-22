@@ -3,4 +3,5 @@
     <Include file="Libs\Libs.xml" />
     <Include file="Components\components.xml" />
     <Script file="Addon.lua" />
+    <Script file="BankFix.lua" />
 </Ui>
