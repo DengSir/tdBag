@@ -52,9 +52,17 @@ function Token:OnClick()
     end
 end
 
+function Token:IsFull(id)
+    local name, quantity, icon, earnedThisWeek, weeklyMax, maxQuantity, discovered, rarity = GetCurrencyInfo(id)
+    if maxQuantity == 0 and weeklyMax == 0 then
+        return false
+    end
+    return (weeklyMax > 0 and earnedThisWeek == weeklyMax) or (maxQuantity > 0 and quantity == maxQuantity)
+end
+
 function Token:SetToken(index)
     local name, count, icon, id = GetBackpackCurrencyInfo(index)
-    local color = IsCurrencyFull and IsCurrencyFull(id) and RED_FONT_COLOR or HIGHLIGHT_FONT_COLOR
+    local color = self:IsFull(id) and RED_FONT_COLOR or HIGHLIGHT_FONT_COLOR
 
     self.index = index
     self.id = id
