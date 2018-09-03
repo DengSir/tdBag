@@ -7,9 +7,25 @@ local ADDON, Addon = ...
 local L = LibStub('AceLocale-3.0'):GetLocale(ADDON)
 local BankTab = Addon:NewClass('BankTab', 'Frame')
 
-local function OnClick(self)
+local BankTabItem = Addon:NewClass('BankTabItem', 'Button')
+
+function BankTabItem:New(parent, id, slot, text)
+    local f =
+        self:Bind(CreateFrame('Button', parent:GetName() .. 'Tab' .. id, parent, 'CharacterFrameTabButtonTemplate'))
+    f.slot = slot
+    f:SetText(text)
+    f:SetID(id)
+    f:SetScript('OnClick', self.OnClick)
+    return f
+end
+
+function BankTabItem:OnClick()
+    if self:IsReagents() and not self:IsCached() and not IsReagentBankUnlocked() then
+        StaticPopup_Show('CONFIRM_BUY_REAGENTBANK_TAB')
+    end
+
     local parent = self:GetParent()
-    local profile = parent:GetProfile()
+    local profile = self:GetProfile()
     local hidden = profile.hiddenBags
     local slot = profile.exclusiveReagent and not hidden[REAGENTBANK_CONTAINER] and REAGENTBANK_CONTAINER or self.slot
     hidden[slot] = not hidden[slot]
@@ -18,13 +34,8 @@ local function OnClick(self)
     parent:SendFrameSignal('FILTERS_CHANGED')
 end
 
-local function CreateTab(parent, id, slot, text)
-    local f = CreateFrame('Button', parent:GetName() .. 'Tab' .. id, parent, 'CharacterFrameTabButtonTemplate')
-    f.slot = slot
-    f:SetText(text)
-    f:SetID(id)
-    f:SetScript('OnClick', OnClick)
-    return f
+function BankTabItem:IsReagents()
+    return Addon:IsReagents(self.slot)
 end
 
 function BankTab:New(parent)
@@ -32,8 +43,8 @@ function BankTab:New(parent)
     f:Hide()
     f:SetSize(1, 1)
 
-    f.bank = CreateTab(f, 1, BANK_CONTAINER, BANK)
-    f.reagent = CreateTab(f, 2, REAGENTBANK_CONTAINER, REAGENT_BANK)
+    f.bank = BankTabItem:New(f, 1, BANK_CONTAINER, BANK)
+    f.reagent = BankTabItem:New(f, 2, REAGENTBANK_CONTAINER, REAGENT_BANK)
 
     f.bank:SetPoint('TOPLEFT')
     f.reagent:SetPoint('LEFT', f.bank, 'RIGHT', -15, 0)
@@ -45,6 +56,19 @@ function BankTab:New(parent)
     return f
 end
 
+function BankTab:IsExclusiveReagent()
+    return self:GetProfile().exclusiveReagent
+end
+
+function BankTab:IsReagentShowing()
+    return self:GetFrame():IsShowingBag(REAGENTBANK_CONTAINER)
+end
+
 function BankTab:OnShow()
-    PanelTemplates_SetTab(self, self:GetFrame():IsShowingBag(REAGENTBANK_CONTAINER) and 2 or 1)
+    local reagentShowing = self:IsReagentShowing()
+    PanelTemplates_SetTab(self, reagentShowing and 2 or 1)
+
+    if reagentShowing and self:IsExclusiveReagent() and not self:IsCached() and not IsReagentBankUnlocked() then
+        StaticPopup_Show('CONFIRM_BUY_REAGENTBANK_TAB')
+    end
 end
