@@ -7,8 +7,6 @@ local ADDON, Addon = ...
 
 local BankFix = Addon:NewModule('BankFix', 'AceEvent-3.0')
 
-local AutoDisplay = Addon:GetModule('AutoDisplay')
-
 function BankFix:OnInitialize()
     self.BankHiddenParent = CreateFrame('Frame')
     self.BankHiddenParent:Hide()
