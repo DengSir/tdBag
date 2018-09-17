@@ -12,6 +12,7 @@ local QUEST = GetItemClassInfo(LE_ITEM_CLASS_QUESTITEM)
 local QUEST_LOWER = QUEST:lower()
 
 local orig_Create = ItemSlot.Create
+local orig_Free = ItemSlot.Free
 
 function ItemSlot:Create()
     local item = orig_Create(self)
@@ -28,6 +29,12 @@ function ItemSlot:Create()
     item.IconBorder:SetDrawLayer('OVERLAY', 7)
 
     return item
+end
+
+function ItemSlot:Free()
+    self.bag = nil
+    self.slot = nil
+    return orig_Free(self)
 end
 
 function ItemSlot:UpdateBorder()
@@ -86,3 +93,34 @@ function ItemSlot:IsJunk()
         return quality == LE_ITEM_QUALITY_POOR and price and price > 0
     end
 end
+
+-- do
+--     local tested = setmetatable({}, {
+--         __index = function(t, k)
+--             t[k] = {}
+--             return t[k]
+--         end
+--     })
+--     local COUNT = 3
+
+--     local IsNewItem = C_NewItems.IsNewItem
+--     local RemoveNewItem = C_NewItems.RemoveNewItem
+
+--     C_NewItems.IsNewItem = function(bag, slot)
+--         if IsNewItem(bag, slot) then
+--             return true
+--         end
+--         local count = tested[bag][slot] or 0
+--         return count < COUNT
+--     end
+
+--     C_NewItems.RemoveNewItem = function(bag, slot)
+--         RemoveNewItem(bag, slot)
+--         tested[bag][slot] = (tested[bag][slot] or 0) + 1
+--     end
+
+--     function _G.TestNew(count)
+--         table.wipe(tested)
+--         COUNT = count
+--     end
+-- end
