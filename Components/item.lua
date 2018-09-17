@@ -16,6 +16,8 @@ local orig_Create = ItemSlot.Create
 function ItemSlot:Create()
     local item = orig_Create(self)
 
+    item.newitemglowAnim:SetLooping('REPEAT')
+
     item.QuestBorder:SetTexture(TEXTURE_ITEM_QUEST_BANG)
     item.QuestBorder:ClearAllPoints()
     item.QuestBorder:SetPoint('BOTTOMLEFT', 5, 4)
@@ -28,86 +30,44 @@ function ItemSlot:Create()
     return item
 end
 
-function ItemSlot:HideBorder()
-    self.QuestBorder:Hide()
-    self.Border:Hide()
-    self.NewItemTexture:Hide()
-    self.BattlepayItemTexture:Hide()
-    self.IconBorder:Hide()
-    self.JunkIcon:Hide()
-    self.IconOverlay:Hide()
-end
-
 function ItemSlot:UpdateBorder()
-    self:HideBorder()
+    local id, quality = self.info.id, self.info.quality
+    local new = Addon.sets.glowNew and self:IsNew()
+    local quest, questID = self:IsQuestItem()
+    local paid = self:IsPaid()
+    local r, g, b
 
-    local item = self.info.link
-    if item then
-        local quality = tonumber(self.info.quality)
-        if Addon.sets.iconJunk and self:IsJunk() then
-            self.JunkIcon:Show()
-        end
+    if new and not self.flashAnim:IsPlaying() then
+        self.flashAnim:Play()
+        self.newitemglowAnim:Play()
+    end
 
-        if self:IsAzeriteEmpowered() then
-            self.IconOverlay:SetAtlas([[AzeriteIconFrame]])
-            self.IconOverlay:Show()
-        end
-
-        if self:IsArtifactRelic() then
-            local r, g, b = GetItemQualityColor(quality)
-            self.IconBorder:Show()
-            self.IconBorder:SetVertexColor(r, g, b)
-        end
-
-        local isQuestItem, isQuestStarter = self:IsQuestItem()
-        if isQuestStarter then
-            self.QuestBorder:Show()
-        end
-
-        if Addon.sets.glowNew and self:IsNew() then
-            if not self.flashAnim:IsPlaying() then
-                self.flashAnim:Play()
-                self.newitemglowAnim:SetLooping('NONE')
-                self.newitemglowAnim:Play()
-            end
-
-            if self:IsPaid() then
-                return self.BattlepayItemTexture:Show()
-            else
-                self.NewItemTexture:SetAtlas(quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] or 'bags-glow-white')
-                self.NewItemTexture:Show()
-                return
-            end
-        end
-
-        if Addon.sets.glowQuest and (isQuestItem or isQuestStarter) then
-            return self:SetBorderColor(1, .82, .2)
-        end
-
-        if Addon.sets.glowSets and ItemSearch:InSet(item) then
-            return self:SetBorderColor(.1, 1, 1)
-        end
-
-        if Addon.sets.glowUnusable and Unfit:IsItemUnusable(item) then
-            return self:SetBorderColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
-        end
-
-        if Addon.sets.glowQuality and quality and quality > 1 then
-            return self:SetBorderColor(GetItemQualityColor(quality))
+    if id then
+        if Addon.sets.glowQuest and quest then
+            r, g, b = 1, .82, .2
+        elseif Addon.sets.glowUnusable and Unfit:IsItemUnusable(id) then
+            r, g, b = RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b
+        elseif Addon.sets.glowSets and ItemSearch:InSet(self.info.link) then
+            r, g, b = .1, 1, 1
+        elseif Addon.sets.glowQuality and quality and quality > 1 then
+            r, g, b = GetItemQualityColor(quality)
         end
     end
-end
 
-function ItemSlot:IsQuestItem()
-    if self.info.id then
-        if self:IsCached() then
-            return select(12, GetItemInfo(self.info.id)) == LE_ITEM_CLASS_QUESTITEM or
-                ItemSearch:Tooltip(self.info.link, QUEST_LOWER), false
-        else
-            local isQuestItem, questID, isActive = GetContainerItemQuestInfo(self:GetBag(), self:GetID())
-            return isQuestItem or questID, (questID and not isActive)
-        end
-    end
+    self.IconBorder:SetVertexColor(r, g, b)
+    self.IconBorder:SetShown(id and C_ArtifactUI.GetRelicInfoByItemID(id))
+
+    self.IconGlow:SetVertexColor(r, g, b, Addon.sets.glowAlpha)
+    self.IconGlow:SetShown(r)
+
+    self.NewItemTexture:SetAtlas(quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] or 'bags-glow-white')
+    self.NewItemTexture:SetShown(new and not paid)
+
+    self.IconOverlay:SetShown(id and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(id))
+    self.BattlepayItemTexture:SetShown(new and paid)
+    self.QuestBorder:SetShown(questID)
+
+    self.JunkIcon:SetShown(Addon.sets.iconJunk and self:IsJunk())
 end
 
 function ItemSlot:IsJunk()
@@ -125,12 +85,4 @@ function ItemSlot:IsJunk()
         local _, _, quality, _, _, _, _, _, _, _, price = GetItemInfo(id)
         return quality == LE_ITEM_QUALITY_POOR and price and price > 0
     end
-end
-
-function ItemSlot:IsArtifactRelic()
-    return self.info.id and IsArtifactRelicItem(self.info.id)
-end
-
-function ItemSlot:IsAzeriteEmpowered()
-    return self.info.id and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(self.info.id)
 end
