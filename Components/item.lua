@@ -50,7 +50,7 @@ function ItemSlot:UpdateBorder()
     end
 
     if id then
-        if Addon.sets.glowQuest and quest then
+        if Addon.sets.glowQuest and (quest or questID) then
             r, g, b = 1, .82, .2
         elseif Addon.sets.glowUnusable and Unfit:IsItemUnusable(id) then
             r, g, b = RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b
