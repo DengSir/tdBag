@@ -38,7 +38,7 @@ function ItemSlot:Free()
 end
 
 function ItemSlot:UpdateBorder()
-    local id, quality = self.info.id, self.info.quality
+    local id, quality = self.info.id, tonumber(self.info.quality)
     local new = Addon.sets.glowNew and self:IsNew()
     local quest, questID = self:IsQuestItem()
     local paid = self:IsPaid()
