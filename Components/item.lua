@@ -34,6 +34,7 @@ end
 function ItemSlot:Free()
     self.bag = nil
     self.slot = nil
+    self.newitemglowAnim:Stop()
     return orig_Free(self)
 end
 
@@ -44,9 +45,16 @@ function ItemSlot:UpdateBorder()
     local paid = self:IsPaid()
     local r, g, b
 
-    if new and not self.flashAnim:IsPlaying() then
-        self.flashAnim:Play()
-        self.newitemglowAnim:Play()
+    if new then
+        if not self.flashAnim:IsPlaying() then
+            self.flashAnim:Play()
+            self.newitemglowAnim:Play()
+        end
+    else
+        if self.flashAnim:IsPlaying() then
+            self.flashAnim:Stop()
+            self.newitemglowAnim:Stop()
+        end
     end
 
     if id then
