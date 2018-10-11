@@ -35,6 +35,7 @@ function ItemSlot:Free()
     self.bag = nil
     self.slot = nil
     self.newitemglowAnim:Stop()
+    self.flashAnim:Stop()
     return orig_Free(self)
 end
 
@@ -46,15 +47,15 @@ function ItemSlot:UpdateBorder()
     local r, g, b
 
     if new then
-        if not self.flashAnim:IsPlaying() then
+        -- if not self.flashAnim:IsPlaying() or not self.newitemglowAnim:IsPlaying() then
             self.flashAnim:Play()
             self.newitemglowAnim:Play()
-        end
+        -- end
     else
-        if self.flashAnim:IsPlaying() then
+        -- if self.flashAnim:IsPlaying() or self.newitemglowAnim:IsPlaying() then
             self.flashAnim:Stop()
             self.newitemglowAnim:Stop()
-        end
+        -- end
     end
 
     if id then
@@ -83,6 +84,29 @@ function ItemSlot:UpdateBorder()
     self.QuestBorder:SetShown(questID)
 
     self.JunkIcon:SetShown(Addon.sets.iconJunk and self:IsJunk())
+end
+
+function ItemSlot:UpdateSearch()
+    local search = Addon.canSearch and Addon.search or ''
+    local matches = search == '' or ItemSearch:Matches(self.info.link, search)
+
+    local isNew = self.newitemglowAnim:IsPlaying()
+    if isNew then
+        self.newitemglowAnim:Stop()
+        self.flashAnim:Stop()
+    end
+
+    if matches then
+        self:UpdateLocked()
+        self:SetAlpha(1)
+    else
+        self:SetLocked(true)
+        self:SetAlpha(0.3)
+    end
+
+    if isNew then
+        self.newitemglowAnim:Play()
+    end
 end
 
 function ItemSlot:IsJunk()

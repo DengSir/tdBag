@@ -19,7 +19,8 @@ function BankFix:OnEnable()
     HideUIPanel(BankFrame)
     BankFrame:SetParent(self.BankHiddenParent)
     BankFrame:ClearAllPoints()
-    BankFrame:SetPoint('TOPLEFT', 0, 0)
+    BankFrame:SetPoint('TOPLEFT', UIParent, 'TOPLEFT', 0, 0)
+    BankFrame:SetSize(1, 1)
 end
 
 function BankFix:BANKFRAME_OPENED()
