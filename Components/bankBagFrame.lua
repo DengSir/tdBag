@@ -4,6 +4,10 @@
 -- @Date   : 8/21/2018, 10:19:57 PM
 
 local ADDON, Addon = ...
+if Addon.IsRetail then
+    return
+end
+
 local L = LibStub('AceLocale-3.0'):GetLocale(ADDON)
 local BankBagFrame = Addon:NewClass('BankBagFrame', 'Frame')
 local Bag = Addon.Bag

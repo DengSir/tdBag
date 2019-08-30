@@ -1,9 +1,12 @@
---[[
-token.lua
-@Author  : DengSir (tdaddon@163.com)
-@Link    : https://dengsir.github.io
-]]
+-- token.lua
+-- @Author  : DengSir (tdaddon@163.com)
+-- @Link    : https://dengsir.github.io
+
 local ADDON, Addon = ...
+if not Addon.IsRetail then
+    return
+end
+
 local Token = Addon:NewClass('Token', 'Button')
 
 local ICON_SIZE = 14

@@ -48,13 +48,13 @@ function ItemSlot:UpdateBorder()
 
     if new then
         -- if not self.flashAnim:IsPlaying() or not self.newitemglowAnim:IsPlaying() then
-            self.flashAnim:Play()
-            self.newitemglowAnim:Play()
+        self.flashAnim:Play()
+        self.newitemglowAnim:Play()
         -- end
     else
         -- if self.flashAnim:IsPlaying() or self.newitemglowAnim:IsPlaying() then
-            self.flashAnim:Stop()
-            self.newitemglowAnim:Stop()
+        self.flashAnim:Stop()
+        self.newitemglowAnim:Stop()
         -- end
     end
 
@@ -70,8 +70,11 @@ function ItemSlot:UpdateBorder()
         end
     end
 
-    self.IconBorder:SetVertexColor(r, g, b)
-    self.IconBorder:SetShown(id and C_ArtifactUI.GetRelicInfoByItemID(id))
+    if Addon.IsRetail then
+        self.IconBorder:SetVertexColor(r, g, b)
+        self.IconBorder:SetShown(id and C_ArtifactUI.GetRelicInfoByItemID(id))
+        self.IconOverlay:SetShown(id and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(id))
+    end
 
     self.IconGlow:SetVertexColor(r, g, b, Addon.sets.glowAlpha)
     self.IconGlow:SetShown(r)
@@ -79,7 +82,6 @@ function ItemSlot:UpdateBorder()
     self.NewItemTexture:SetAtlas(quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] or 'bags-glow-white')
     self.NewItemTexture:SetShown(new and not paid)
 
-    self.IconOverlay:SetShown(id and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(id))
     self.BattlepayItemTexture:SetShown(new and paid)
     self.QuestBorder:SetShown(questID)
 
@@ -125,34 +127,3 @@ function ItemSlot:IsJunk()
         return quality == LE_ITEM_QUALITY_POOR and price and price > 0
     end
 end
-
--- do
---     local tested = setmetatable({}, {
---         __index = function(t, k)
---             t[k] = {}
---             return t[k]
---         end
---     })
---     local COUNT = 3
-
---     local IsNewItem = C_NewItems.IsNewItem
---     local RemoveNewItem = C_NewItems.RemoveNewItem
-
---     C_NewItems.IsNewItem = function(bag, slot)
---         if IsNewItem(bag, slot) then
---             return true
---         end
---         local count = tested[bag][slot] or 0
---         return count < COUNT
---     end
-
---     C_NewItems.RemoveNewItem = function(bag, slot)
---         RemoveNewItem(bag, slot)
---         tested[bag][slot] = (tested[bag][slot] or 0) + 1
---     end
-
---     function _G.TestNew(count)
---         table.wipe(tested)
---         COUNT = count
---     end
--- end

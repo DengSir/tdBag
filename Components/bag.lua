@@ -15,6 +15,10 @@ function Bag:UpdateToggle()
     SetItemButtonTextureVertexColor(self, 1, color, color)
     SetItemButtonDesaturated(self, self:IsHidden())
     self:SetChecked(false)
+
+    if not Addon.IsRetail then
+        self:RegisterForClicks('LeftButtonUp')
+    end
 end
 
 function Bag:SetIcon(icon)

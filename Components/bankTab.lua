@@ -4,14 +4,18 @@
 -- @Date   : 8/21/2018, 5:27:58 PM
 
 local ADDON, Addon = ...
+if Addon.IsRetail then
+    return
+end
+
 local L = LibStub('AceLocale-3.0'):GetLocale(ADDON)
 local BankTab = Addon:NewClass('BankTab', 'Frame')
 
 local BankTabItem = Addon:NewClass('BankTabItem', 'Button')
 
 function BankTabItem:New(parent, id, slot, text)
-    local f =
-        self:Bind(CreateFrame('Button', parent:GetName() .. 'Tab' .. id, parent, 'CharacterFrameTabButtonTemplate'))
+    local f = self:Bind(
+                  CreateFrame('Button', parent:GetName() .. 'Tab' .. id, parent, 'CharacterFrameTabButtonTemplate'))
     f.slot = slot
     f:SetText(text)
     f:SetID(id)

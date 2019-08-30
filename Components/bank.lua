@@ -12,6 +12,10 @@ local BankTab = Addon.BankTab
 Bank.BagFrame = Addon.BankBagFrame
 Bank.Icon = [[Interface\ICONS\INV_Misc_Bag_13]]
 
+if not Addon.IsRetail then
+    return
+end
+
 function Bank:Layout()
     Frame.Layout(self)
     self:PlaceTabView()
@@ -38,5 +42,6 @@ function Bank:CreateTabView()
 end
 
 function Bank:IsBagFrameShown(args)
-    return self:GetProfile().showBags and (not self.profile.exclusiveReagent or not self:IsShowingBag(REAGENTBANK_CONTAINER))
+    return self:GetProfile().showBags and
+               (not self.profile.exclusiveReagent or not self:IsShowingBag(REAGENTBANK_CONTAINER))
 end

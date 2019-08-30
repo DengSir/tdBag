@@ -1,11 +1,12 @@
---[[
-titleFrame.lua
-@Author  : DengSir (tdaddon@163.com)
-@Link    : https://dengsir.github.io
-]]
-
+-- titleFrame.lua
+-- @Author  : DengSir (tdaddon@163.com)
+-- @Link    : https://dengsir.github.io
 
 local ADDON, Addon = ...
+if not Addon.IsRetail then
+    return
+end
+
 local TokenFrame = Addon:NewClass('TokenFrame', 'Frame')
 LibStub('AceHook-3.0'):Embed(TokenFrame)
 

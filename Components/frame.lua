@@ -16,6 +16,7 @@ function Frame:New(id)
     f.quality = 0
     f.profile = f:GetBaseProfile()
     f.menuButtons = {}
+    f.pluginButtons = {}
 
     f.portrait:SetMask([[Textures\MinimapMask]])
     f.portrait:SetTexture(f.Icon or [[Interface\Buttons\Button-Backpack-Up]])
@@ -53,7 +54,9 @@ function Frame:UpdateAppearance()
     self:SetScale(self.profile.scale)
 
     if changed then
-        HideUIPanel(self)
+        if shown then
+            HideUIPanel(self)
+        end
 
         self:SetAttribute('UIPanelLayout-enabled', managed)
         self:SetAttribute('UIPanelLayout-defined', managed)
@@ -164,7 +167,7 @@ end
 -- sort button
 
 function Frame:HasSortButton()
-    return self.profile.sort
+    return self.profile.sort and SortBags
 end
 
 function Frame:CreateSortButton()
@@ -187,6 +190,18 @@ end
 
 -- menu buttons
 
+function Frame:CreatePluginButton(item)
+    local button = CreateFrame('Button', nil, self, 'tdBagToggleButtonTemplate')
+    button.texture:SetTexture(item.icon)
+    item.init(button, self)
+    self.pluginButtons[item.name] = button
+    return button
+end
+
+function Frame:HasPluginButton(item)
+    return not self.profile[item.key]
+end
+
 function Frame:PlaceMenuButtons()
     local menuButtons = self.menuButtons
 
@@ -195,6 +210,12 @@ function Frame:PlaceMenuButtons()
     end
 
     wipe(menuButtons)
+
+    for _, item in Addon:IteratePluginButtons() do
+        if self:HasPluginButton(item) then
+            table.insert(menuButtons, self.pluginButtons[item.name] or self:CreatePluginButton(item))
+        end
+    end
 
     if self:HasSortButton() then
         tinsert(menuButtons, self.sortButton or self:CreateSortButton())
@@ -279,7 +300,7 @@ end
 -- token frame
 
 function Frame:HasTokenFrame()
-    return self.profile.broker and self:IsSelf()
+    return self.profile.broker and self:IsSelf() and Addon.TokenFrame
 end
 
 function Frame:PlaceTokenFrame()
