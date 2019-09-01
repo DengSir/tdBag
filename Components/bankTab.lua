@@ -4,7 +4,7 @@
 -- @Date   : 8/21/2018, 5:27:58 PM
 
 local ADDON, Addon = ...
-if Addon.IsRetail then
+if not Addon.IsRetail then
     return
 end
 

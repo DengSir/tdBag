@@ -6,8 +6,6 @@
 local ADDON, Addon = ...
 local L = LibStub('AceLocale-3.0'):GetLocale(ADDON)
 local Bank = Addon.BankFrame
-local Frame = Addon.Frame
-local BankTab = Addon.BankTab
 
 Bank.BagFrame = Addon.BankBagFrame
 Bank.Icon = [[Interface\ICONS\INV_Misc_Bag_13]]
@@ -15,6 +13,9 @@ Bank.Icon = [[Interface\ICONS\INV_Misc_Bag_13]]
 if not Addon.IsRetail then
     return
 end
+
+local Frame = Addon.Frame
+local BankTab = Addon.BankTab
 
 function Bank:Layout()
     Frame.Layout(self)

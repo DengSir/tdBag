@@ -15,10 +15,6 @@ function Bag:UpdateToggle()
     SetItemButtonTextureVertexColor(self, 1, color, color)
     SetItemButtonDesaturated(self, self:IsHidden())
     self:SetChecked(false)
-
-    if not Addon.IsRetail then
-        self:RegisterForClicks('LeftButtonUp')
-    end
 end
 
 function Bag:SetIcon(icon)
@@ -29,7 +25,6 @@ end
 function Bag:Update()
     local info = self:GetInfo()
 
-    self.FilterIcon:Hide()
     self.Count:SetText(info.free and info.free > 0 and info.free)
 
     if self:IsBackpack() or self:IsBank() then
@@ -45,14 +40,18 @@ function Bag:Update()
         end
     end
 
-    if not info.cached then
-        for i = LE_BAG_FILTER_FLAG_EQUIPMENT, NUM_LE_BAG_FILTER_FLAGS do
-            local id = self:GetSlot()
-            local active = id > NUM_BAG_SLOTS and GetBankBagSlotFlag(id - NUM_BAG_SLOTS, i) or GetBagSlotFlag(id, i)
+    if Addon.IsRetail then
+        self.FilterIcon:Hide()
 
-            if active then
-                self.FilterIcon.Icon:SetAtlas(BAG_FILTER_ICONS[i])
-                self.FilterIcon:Show()
+        if not info.cached then
+            for i = LE_BAG_FILTER_FLAG_EQUIPMENT, NUM_LE_BAG_FILTER_FLAGS do
+                local id = self:GetSlot()
+                local active = id > NUM_BAG_SLOTS and GetBankBagSlotFlag(id - NUM_BAG_SLOTS, i) or GetBagSlotFlag(id, i)
+
+                if active then
+                    self.FilterIcon.Icon:SetAtlas(BAG_FILTER_ICONS[i])
+                    self.FilterIcon:Show()
+                end
             end
         end
     end
