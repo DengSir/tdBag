@@ -217,9 +217,9 @@ function Frame:PlaceMenuButtons()
         end
     end
 
-    if self:HasSortButton() then
-        tinsert(menuButtons, self.sortButton or self:CreateSortButton())
-    end
+    -- if self:HasSortButton() then
+    --     tinsert(menuButtons, self.sortButton or self:CreateSortButton())
+    -- end
     if self:HasBagToggle() then
         tinsert(menuButtons, self.bagToggle or self:CreateBagToggle())
     end

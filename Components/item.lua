@@ -13,6 +13,7 @@ local QUEST_LOWER = QUEST:lower()
 
 local orig_Create = ItemSlot.Create
 local orig_Free = ItemSlot.Free
+local orig_CreateDummySlot = ItemSlot.CreateDummySlot
 
 function ItemSlot:Create()
     local item = orig_Create(self)
@@ -126,4 +127,33 @@ function ItemSlot:IsJunk()
         local _, _, quality, _, _, _, _, _, _, _, price = GetItemInfo(id)
         return quality == LE_ITEM_QUALITY_POOR and price and price > 0
     end
+end
+
+local function Slot_OnEnter(self)
+    local parent = self:GetParent()
+    local item = parent:IsCached() and parent.info.link
+
+    if item then
+        parent.AnchorTooltip(self)
+
+        if item:find('battlepet:') then
+            local _, specie, level, quality, health, power, speed = strsplit(':', item)
+            local name = item:match('%[(.-)%]')
+
+            BattlePetToolTip_Show(tonumber(specie), level, tonumber(quality), health, power, speed, name)
+        else
+            GameTooltip:SetHyperlink(item, parent.info.count)
+            GameTooltip:Show()
+        end
+    end
+
+    parent:LockHighlight()
+    CursorUpdate(parent)
+end
+
+function ItemSlot:CreateDummySlot()
+    local slot = orig_CreateDummySlot(self)
+    slot:SetScript('OnEnter', Slot_OnEnter)
+    slot.UpdateTooltip = Slot_OnEnter
+    return slot
 end

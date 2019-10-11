@@ -1,4 +1,24 @@
-local Lib = LibStub:NewLibrary('LibItemCache-2.0', 16)
+--[[
+Copyright 2013-2019 João Cardoso
+LibItemCache is distributed under the terms of the GNU General Public License (Version 3).
+As a special exception, the copyright holders of this library give you permission to embed it
+with independent modules to produce an addon, regardless of the license terms of these
+independent modules, and to copy and distribute the resulting software under terms of your
+choice, provided that you also meet, for each embedded independent module, the terms and
+conditions of the license of that module. Permission is not granted to modify this library.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the library. If not, see <http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This file is part of LibItemCache.
+--]]
+
+local Lib = LibStub:NewLibrary('LibItemCache-2.0', 20)
 if not Lib then
 	return
 end
@@ -15,7 +35,7 @@ local FindRealms = function()
 		PLAYER, REALM = UnitFullName('player')
 		REALMS = GetAutoCompleteRealms()
 
-		if #REALMS == 0 then
+		if not REALMS or #REALMS == 0 then
 			REALMS = {REALM}
 		end
 	end
@@ -133,18 +153,20 @@ function Lib:GetBagInfo(owner, bag)
 
 	if isguild then
 		item.count = 98
-	elseif bag == REAGENTBANK_CONTAINER or bag == BACKPACK_CONTAINER or bag == BANK_CONTAINER then
-		item.count = GetContainerNumSlots(bag)
 	elseif bag == 'vault' then
 		item.count = 160
+	elseif bag == 'equip' then
+		item.count = INVSLOT_LAST_EQUIPPED
+	else
+		if bag == REAGENTBANK_CONTAINER or bag == BACKPACK_CONTAINER or bag == BANK_CONTAINER then
+			item.count = GetContainerNumSlots(bag)
+		end
+
+		item.owned = item.owned or (bag >= KEYRING_CONTAINER and bag <= NUM_BAG_SLOTS) or item.id or item.link
 	end
 
 	if cached then
 		item.cached = true
-	elseif bag == 'equip' then
-		item.count = INVSLOT_LAST_EQUIPPED
-	elseif bag == 'vault' then
-		item.count = 160
 	elseif isguild then
 		local name, icon, view, deposit, withdraw, remaining = GetGuildBankTabInfo(bag)
 		if not query then
@@ -152,16 +174,22 @@ function Lib:GetBagInfo(owner, bag)
 		end
 
 		item.name, item.icon, item.viewable = name, icon, view
-	else
+	elseif tonumber(bag) then
 		item.free = GetContainerNumFreeSlots(bag)
 
 		if bag == REAGENTBANK_CONTAINER then
+			item.cost = GetReagentBankCost()
 			item.owned = IsReagentBankUnlocked()
 		elseif bag ~= BACKPACK_CONTAINER and bag ~= BANK_CONTAINER then
 			item.slot = ContainerIDToInventoryID(bag)
 			item.link = GetInventoryItemLink('player', item.slot)
 			item.icon = GetInventoryItemTexture('player', item.slot)
 			item.count = GetContainerNumSlots(bag)
+
+			if bag > NUM_BAG_SLOTS then
+				item.owned = (bag - NUM_BAG_SLOTS) <= GetNumBankSlots()
+				item.cost = GetBankSlotCost()
+			end
 		end
 	end
 
@@ -209,6 +237,23 @@ function Lib:GetItemID(owner, bag, slot)
 		return GetVoidItemInfo(1, slot)
 	else
 		return GetContainerItemID(bag, slot)
+	end
+end
+
+function Lib:PickupItem(owner, bag, slot)
+	local realm, name, isguild = self:GetOwnerAddress(owner)
+	local cached = self:IsBagCached(realm, name, isguild, bag)
+
+	if not cached then
+		if isguild then
+			PickupGuildBankItem(slot)
+		elseif bag == 'equip' then
+			PickupInventoryItem(slot)
+		elseif bag == 'vault' then
+			ClickVoidStorageSlot(1, slot)
+		else
+			PickupContainerItem(bag, slot)
+		end
 	end
 end
 

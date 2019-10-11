@@ -13,7 +13,7 @@ function Bag:UpdateToggle()
     local color = self:IsPurchasable() and .1 or 1
 
     SetItemButtonTextureVertexColor(self, 1, color, color)
-    SetItemButtonDesaturated(self, self:IsHidden())
+    SetItemButtonDesaturated(self, not self:IsToggled())
     self:SetChecked(false)
 end
 

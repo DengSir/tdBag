@@ -40,4 +40,14 @@
             <KeyValue key="icon" value="Interface\ICONS\INV_Pet_Broom" type="string" />
         </KeyValues>
     </CheckButton>
+
+    <Button name="tdBagOwnerSelectorTemplate" virtual="true">
+        <Size x="68" y="68"/>
+        <HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">
+            <Size x="78" y="78"/>
+            <Anchors>
+                <Anchor point="TOPLEFT" x="-4" y="0"/>
+            </Anchors>
+        </HighlightTexture>
+    </Button>
 </Ui>
